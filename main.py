@@ -1,49 +1,38 @@
-from aiogram import Bot, Dispatcher, types
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-from aiogram.utils import executor
 import logging
+import random
+from aiogram import Bot, Dispatcher, executor, types
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-# Твій Telegram Token (уже вставлено)
-API_TOKEN = "7458160287:AAFn3FNZHGr8wQBTV-eKL9YmzeaDi-7Gm8Y"
+API_TOKEN = '7458160287:AAFn3FNZHGr8wQBTV-eKL9YmzeaDi-7Gm8Y'
 
-# Увімкнення логів
+# Налаштування логування
 logging.basicConfig(level=logging.INFO)
 
-# Ініціалізація бота
+# Ініціалізація бота та диспетчера
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
-# Стартова команда /start з кнопками
+# Завантаження цитат з файлу
+with open("quotes.txt", "r", encoding="utf-8") as file:
+    quotes = [line.strip() for line in file if line.strip()]
+
+# Кнопка
+keyboard = InlineKeyboardMarkup().add(
+    InlineKeyboardButton("💪 Мотивуй мене!", callback_data="motivate")
+)
+
+# Хендлер для старту
 @dp.message_handler(commands=['start'])
-async def start_handler(message: types.Message):
-    keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-    keyboard.add(
-        KeyboardButton("🔥 Самомотивація"),
-        KeyboardButton("🎯 Цілі та фокус")
-    )
-    keyboard.add(
-        KeyboardButton("💪 Сила волі"),
-        KeyboardButton("💡 Натхнення")
-    )
-    await message.answer("Привіт! Обери категорію мотивації:", reply_markup=keyboard)
+async def send_welcome(message: types.Message):
+    await message.answer("Привіт! Натисни кнопку, щоб отримати мотивацію 👇", reply_markup=keyboard)
 
-# Обробники повідомлень-кнопок
-@dp.message_handler(lambda message: message.text == "🔥 Самомотивація")
-async def handle_self_motivation(message: types.Message):
-    await message.answer("🔥 Ти — головна сила свого успіху. Дій!")
+# Обробка натискання кнопки
+@dp.callback_query_handler(lambda c: c.data == 'motivate')
+async def process_motivation(callback_query: types.CallbackQuery):
+    quote = random.choice(quotes)
+    await bot.answer_callback_query(callback_query.id)
+    await bot.send_message(callback_query.from_user.id, quote)
 
-@dp.message_handler(lambda message: message.text == "🎯 Цілі та фокус")
-async def handle_goals(message: types.Message):
-    await message.answer("🎯 Зосередься на одному, але важливому кроці сьогодні.")
-
-@dp.message_handler(lambda message: message.text == "💪 Сила волі")
-async def handle_willpower(message: types.Message):
-    await message.answer("💪 Роби навіть тоді, коли не хочеться. Саме тоді з’являється сила.")
-
-@dp.message_handler(lambda message: message.text == "💡 Натхнення")
-async def handle_inspiration(message: types.Message):
-    await message.answer("💡 Натхнення не чекають — його створюють. Створи свій шанс.")
-
-# Запуск бота
+# Запуск
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
