@@ -1,2 +1,4 @@
+# requirements.txt
 aiogram==2.25.2
-aiohttp==3.8.6
+aiohttp==3.7.4.post0
+apscheduler==3.10.4
