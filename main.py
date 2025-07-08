@@ -1,7 +1,7 @@
 import logging
 import random
 from aiogram import Bot, Dispatcher, executor, types
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 API_TOKEN = '7458160287:AAFn3FNZHGr8wQBTV-eKL9YmzeaDi-7Gm8Y'
 
@@ -12,26 +12,25 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
-# Завантаження всіх цитат з файлу (ігноруємо порожні рядки та теги)
+# Завантаження цитат з файлу
 with open("quotes.txt", "r", encoding="utf-8") as file:
     quotes = [line.strip() for line in file if line.strip() and not line.startswith('#')]
 
-# Одна кнопка
-keyboard = InlineKeyboardMarkup().add(
-    InlineKeyboardButton("💪 Мотивуй мене!", callback_data="motivate")
+# Клавіатура з кнопкою внизу
+reply_keyboard = ReplyKeyboardMarkup(resize_keyboard=True).add(
+    KeyboardButton("💪 Мотивуй мене!")
 )
 
-# /start — привітання з кнопкою
+# /start — надсилає вітання з кнопкою
 @dp.message_handler(commands=['start'])
 async def send_welcome(message: types.Message):
-    await message.answer("Привіт! Натисни кнопку, щоб отримати мотивацію 👇", reply_markup=keyboard)
+    await message.answer("Привіт! Я готовий тебе мотивувати! Натисни кнопку 👇", reply_markup=reply_keyboard)
 
-# Обробка натискання кнопки
-@dp.callback_query_handler(lambda c: c.data == 'motivate')
-async def process_motivation(callback_query: types.CallbackQuery):
+# Обробка натискання кнопки-клавіші
+@dp.message_handler(lambda message: message.text == "💪 Мотивуй мене!")
+async def send_quote(message: types.Message):
     quote = random.choice(quotes)
-    await bot.answer_callback_query(callback_query.id)
-    await bot.send_message(callback_query.from_user.id, quote)
+    await message.answer(quote)
 
 # Запуск
 if __name__ == '__main__':
