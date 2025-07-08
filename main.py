@@ -12,16 +12,16 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
-# Завантаження цитат з файлу
+# Завантаження всіх цитат з файлу (ігноруємо порожні рядки та теги)
 with open("quotes.txt", "r", encoding="utf-8") as file:
-    quotes = [line.strip() for line in file if line.strip()]
+    quotes = [line.strip() for line in file if line.strip() and not line.startswith('#')]
 
-# Кнопка
+# Одна кнопка
 keyboard = InlineKeyboardMarkup().add(
     InlineKeyboardButton("💪 Мотивуй мене!", callback_data="motivate")
 )
 
-# Хендлер для старту
+# /start — привітання з кнопкою
 @dp.message_handler(commands=['start'])
 async def send_welcome(message: types.Message):
     await message.answer("Привіт! Натисни кнопку, щоб отримати мотивацію 👇", reply_markup=keyboard)
