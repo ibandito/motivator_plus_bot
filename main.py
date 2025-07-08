@@ -5,7 +5,8 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.utils import executor
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-API_TOKEN = 7458160287:AAFn3FNZHGr8wQBTV-eKL9YmzeaDi-7Gm8Y
+API_TOKEN = API_TOKEN = "7458160287:AAFn3FNZHGr8wQBTV-eKL9YmzeaDi-7Gm8Y"
+
 ADMIN_ID = 217716970
 
 logging.basicConfig(level=logging.INFO)
