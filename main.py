@@ -65,3 +65,61 @@ if __name__ == '__main__':
     scheduler.add_job(send_daily_quotes, 'interval', hours=24)
     scheduler.start()
     executor.start_polling(dp, skip_updates=True)
+
+from aiogram import Bot, Dispatcher, executor, types
+import random
+
+API_TOKEN = "тут_твій_токен_в_лапках"
+
+bot = Bot(token=API_TOKEN)
+dp = Dispatcher(bot)
+
+# Приклади мотиваційних повідомлень по категоріях
+MOTIVATIONS = {
+    "спорт": [
+        "🏋️‍♂️ Кожен день — це новий шанс стати кращим!",
+        "Не зупиняйся, поки не будеш гордитися собою!",
+        "Твій пот сьогодні — це твої результати завтра!"
+    ],
+    "робота": [
+        "💼 Важка праця сьогодні — успіх завтра.",
+        "Кожен маленький крок веде до великої мети!",
+        "Не бійся викликів — вони роблять тебе сильнішим!"
+    ],
+    "навчання": [
+        "📚 Знання — це найкраща інвестиція в себе!",
+        "Навчайся сьогодні, щоб завтра бути кращим.",
+        "Твій мозок — твій найкращий інструмент!"
+    ],
+    "саморозвиток": [
+        "🌱 Зміни починаються з тебе.",
+        "Стань версією себе, якою будеш пишатися.",
+        "Рухайся вперед, навіть якщо повільно!"
+    ],
+}
+
+@dp.message_handler(commands=["start", "help"])
+async def send_welcome(message: types.Message):
+    keyboard = types.InlineKeyboardMarkup()
+    buttons = [
+        types.InlineKeyboardButton(text="Спорт", callback_data="спорт"),
+        types.InlineKeyboardButton(text="Робота", callback_data="робота"),
+        types.InlineKeyboardButton(text="Навчання", callback_data="навчання"),
+        types.InlineKeyboardButton(text="Саморозвиток", callback_data="саморозвиток"),
+    ]
+    keyboard.add(*buttons)
+    await message.answer(
+        "Привіт! Обери категорію мотивації 👇",
+        reply_markup=keyboard
+    )
+
+@dp.callback_query_handler(lambda c: c.data in MOTIVATIONS)
+async def process_callback(callback_query: types.CallbackQuery):
+    category = callback_query.data
+    text = random.choice(MOTIVATIONS[category])
+    await bot.answer_callback_query(callback_query.id)
+    await bot.send_message(callback_query.from_user.id, text)
+
+if __name__ == "__main__":
+    executor.start_polling(dp, skip_updates=True)
+
