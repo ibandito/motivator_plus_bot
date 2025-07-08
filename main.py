@@ -69,7 +69,7 @@ if __name__ == '__main__':
 from aiogram import Bot, Dispatcher, executor, types
 import random
 
-API_TOKEN = "тут_твій_токен_в_лапках"
+API_TOKEN = API_TOKEN = "7458160287:AAFn3FNZHGr8wQBTV-eKL9YmzeaDi-7Gm8Y"
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
